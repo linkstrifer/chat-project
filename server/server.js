@@ -25,6 +25,13 @@ const MessageSchema = mongoose.Schema({
 const MessageModel = mongoose.model("Message", MessageSchema);
 
 const app = express();
+const server = require("http").createServer(app);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
 const port = process.env.PORT || 8000;
 
@@ -50,6 +57,7 @@ app.post("/channel/:id", (request, response) => {
   if (text && user) {
     MessageModel.create({ user, text, channel: id })
       .then((result) => {
+        io.emit("newMessage", result);
         response.status(200).json(result);
       })
       .catch((error) => {
@@ -60,6 +68,12 @@ app.post("/channel/:id", (request, response) => {
   }
 });
 
-app.listen(port, () => {
+// Sockets
+
+io.on("connection", () => {
+  console.log("new socket connection");
+});
+
+server.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });

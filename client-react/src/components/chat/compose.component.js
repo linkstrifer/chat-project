@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { API } from "./constants";
 
-function Compose({ onSuccess }) {
+function Compose() {
   const [value, setValue] = useState("");
 
   return (
@@ -22,7 +22,6 @@ function Compose({ onSuccess }) {
             }),
           })
             .then(() => {
-              onSuccess();
               setValue("");
             })
             .catch((error) => console.error(error));

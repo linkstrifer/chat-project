@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
+import io from "socket.io-client";
 
 import Messages from "./messages.component";
 import Compose from "./compose.component";
 
 import { API } from "./constants";
+
+const socket = io("http://localhost:8000");
 
 function getMessages() {
   return fetch(`${API}/channel/general`, {
@@ -24,16 +27,16 @@ function Chat() {
 
   useEffect(() => {
     loadMessages();
+
+    socket.on("newMessage", (newMessage) => {
+      setMessages((messages) => [...messages, newMessage]);
+    });
   }, []);
 
   return (
     <div>
       <Messages messages={messages} />
-      <Compose
-        onSuccess={() => {
-          loadMessages();
-        }}
-      />
+      <Compose />
     </div>
   );
 }
